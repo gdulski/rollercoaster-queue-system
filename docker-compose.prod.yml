@@ -1,0 +1,19 @@
+# Rozszerzenie docker-compose dla trybu produkcyjnego
+version: '3.8'
+
+services:
+  php:
+    environment:
+      - CI_ENVIRONMENT=production
+    volumes:
+      - ./:/var/www/html
+      - ./docker/php/prod.ini:/usr/local/etc/php/conf.d/custom.ini
+    command: php-fpm -d display_errors=0 -d error_reporting=E_ERROR
+
+  nginx:
+    volumes:
+      - ./docker/nginx/prod.conf:/etc/nginx/conf.d/default.conf
+
+
+
+
