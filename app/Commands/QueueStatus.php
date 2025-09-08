@@ -142,6 +142,7 @@ class QueueStatus extends BaseCommand
         foreach ($statistics['coasters'] as $coaster) {
             $transformed[] = [
                 'name' => $coaster['name'],
+                'redis_id' => $coaster['redis_id'] ?? $coaster['id'],
                 'status' => $coaster['status'] === 'OK' ? 'Aktywna' : 'Problem',
                 'personnel' => $coaster['available_personnel'] . '/' . $coaster['required_personnel'],
                 'wagons' => $coaster['wagon_count'],
@@ -215,16 +216,17 @@ class QueueStatus extends BaseCommand
         }
 
         // Wyświetl nagłówek tabeli
-        CLI::write(str_repeat('=', 120), 'yellow');
+        CLI::write(str_repeat('=', 150), 'yellow');
         CLI::write(sprintf(
-            '| %-20s | %-12s | %-15s | %-8s | %-50s |',
+            '| %-20s | %-25s | %-12s | %-15s | %-8s | %-50s |',
             'Nazwa Kolejki',
+            'ID Redis',
             'Status',
             'Personel',
             'Wagony',
             'Problemy'
         ), 'cyan');
-        CLI::write(str_repeat('=', 120), 'yellow');
+        CLI::write(str_repeat('=', 150), 'yellow');
 
         // Wyświetl dane kolejek
         foreach ($data as $coaster) {
@@ -240,8 +242,9 @@ class QueueStatus extends BaseCommand
             }
             
             CLI::write(sprintf(
-                '| %-20s | %-20s | %-15s | %-8s | %-50s |',
+                '| %-20s | %-25s | %-20s | %-15s | %-8s | %-50s |',
                 $coaster['name'] ?? 'N/A',
+                $coaster['redis_id'] ?? 'N/A',
                 $status,
                 $coaster['personnel'] ?? 'N/A',
                 $coaster['wagons'] ?? 0,
@@ -249,7 +252,7 @@ class QueueStatus extends BaseCommand
             ));
         }
         
-        CLI::write(str_repeat('=', 120), 'yellow');
+        CLI::write(str_repeat('=', 150), 'yellow');
         CLI::newLine();
 
         // Wyświetl podsumowanie systemu

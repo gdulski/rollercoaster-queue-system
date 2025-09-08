@@ -106,6 +106,7 @@ class StatisticsService
         return [
             'name' => $coasterName,
             'id' => $coasterId,
+            'redis_id' => $coasterId, // Dodajemy prawdziwe ID z Redis
             'operating_hours' => $coaster['opening_time'] . ' - ' . $coaster['closing_time'],
             'wagon_count' => $wagonCount,
             'available_personnel' => $availablePersonnel,

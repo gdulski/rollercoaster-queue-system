@@ -1,7 +1,7 @@
 # System Kolejek Górskich - Makefile
 # Ułatwienia do zarządzania projektem
 
-.PHONY: help start stop restart clean build rebuild logs status test test-unit test-coverage test-watch health redis coaster-status coaster-status-json coaster-status-refresh
+.PHONY: help start stop restart clean build rebuild logs status test test-unit test-coverage test-watch health redis coaster-status coaster-status-json coaster-status-refresh coaster-monitor coaster-monitor-fast coaster-monitor-clear
 
 # Domyślna komenda
 help: ## Wyświetl dostępne komendy
@@ -117,6 +117,18 @@ coaster-status-json: ## Wyświetl status kolejek w formacie JSON
 coaster-status-refresh: ## Odśwież i wyświetl status kolejek
 	@echo "🔄 Odświeżanie statusu kolejek górskich:"
 	@docker-compose exec php php spark coaster:status --refresh
+
+coaster-monitor: ## Monitor kolejek w czasie rzeczywistym
+	@echo "🎢 Uruchamianie monitora w czasie rzeczywistym:"
+	@docker-compose exec php php spark coaster:monitor
+
+coaster-monitor-fast: ## Monitor z szybkim odświeżaniem (2s)
+	@echo "⚡ Uruchamianie szybkiego monitora:"
+	@docker-compose exec php php spark coaster:monitor --interval=2
+
+coaster-monitor-clear: ## Monitor z czyszczeniem ekranu
+	@echo "🧹 Uruchamianie monitora z czyszczeniem ekranu:"
+	@docker-compose exec php php spark coaster:monitor --clear
 
 install: ## Zainstaluj zależności PHP
 	@echo "📦 Instalowanie zależności PHP..."

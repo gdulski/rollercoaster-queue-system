@@ -17,10 +17,11 @@ operacyjne. Dane te są podawane ręcznie i same się nie zmieniają
 "16:00" } 
 
 2. Rejestracja nowego wagonu 
-1. Endpoint: POST /api/coasters/:coasterId/wagons 
-2. Dodaje nowy wagon do określonej kolejki górskiej, z danymi dotyczącymi liczby 
+    1. Endpoint: POST /api/coasters/:coasterId/wagons 
+    2. Dodaje nowy wagon do określonej kolejki górskiej, z danymi dotyczącymi liczby 
 miejsc i prędkości (m/s) 
-3. Przykład danych: { ilosc_miejsc: 32, predkosc_wagonu: 1.2 } 
+    3. Przykład danych: { ilosc_miejsc: 32, predkosc_wagonu: 1.2 } 
+
 3. Usunięcie wagonu 
 1. Endpoint: DELETE /api/coasters/:coasterId/wagons/:wagonId 
 2. Usuwa wybrany wagon z danej kolejki górskiej 
@@ -48,15 +49,17 @@ usuwanie wagonów przez API
 3. każdy wagon musi wrócić przed końcem czasu działania kolejki górskiej 
 4. wagony potrzebują 5 minut przerwy, zanim ponownie będą mogły działać po 
 skończonej trasie 
+
 Zarządzanie personelem (p): 
 1. do obsługi każdej kolejki górskiej wymagany jest 1 p (np. sprzedawca biletów - 
-nie jest to istotne) 
+    nie jest to istotne) 
 2. do obsługi każdego wagonu dodatkowo wymagane są 2 p (np. maszynista i 
-mechanik - nie jest to istotne) 
+    mechanik - nie jest to istotne) 
 3. jeśli w systemie brakuje odpowiedniej liczby p do obsługi kolejki lub wagonu, 
-system informuje o tym oraz wylicza brakującą liczbę p 
+    system informuje o tym oraz wylicza brakującą liczbę p 
 4. jeśli w systemie jest za dużo p, system informuje o tym oraz wylicza 
-nadmiarową liczbę p 
+    nadmiarową liczbę p 
+
 Zarządzanie klientami: 
 1. system monitoruje liczbę klientów, których kolejka górska powinna obsłużyć w 
 ciągu dnia 
@@ -65,6 +68,7 @@ system informuje o tym i wylicza, ile brakuje wagonów oraz personelu
 3. jeśli kolejka górska ma więcej mocy przerobowych niż wymagane, tj. obsłuży 
 ponad dwukrotnie więcej klientów niż zaplanowano, system informuje o 
 nadmiarowej liczbie wagonów i personelu 
+
 Statystyki i monitorowanie (konsola): 
 1. Stwórz asynchroniczny serwis monitorujący w PHP CLI bez użycia blokujących 
 pętli, który wyświetla w czasie rzeczywistym statystyki dotyczące systemu 
@@ -79,21 +83,24 @@ zmieniające się dane dotyczące kolejek, wagonów, personelu i klientów
 6. Po wykryciu problemu, zapisz informację w pliku log jako symulację wysłania 
 powiadomienia. Powinno to obejmować szczegóły problemu i czas jego 
 wykrycia, np. 
+
 7. [2024-11-29 00:12:30] Kolejka A1 - Problem: Brakuje 2 
 pracowników, brak 2 wagonów 
 [Godzina 14:27] 
+
 [Kolejka A1] 
-1. Godziny działania: 08:00 - 18:00 
-2. Liczba wagonów: 5/5 
-3. Dostępny personel: 12/12 
-4. Klienci dziennie: 200 
-5. Status: OK 
+    1. Godziny działania: 08:00 - 18:00 
+    2. Liczba wagonów: 5/5 
+    3. Dostępny personel: 12/12 
+    4. Klienci dziennie: 200 
+    5. Status: OK 
 [Kolejka A2] 
-1. Godziny działania: 09:00 - 17:00 
-2. Liczba wagonów: 4/6 
-3. Dostępny personel: 8/10 
-4. Klienci dziennie: 150 
-5. Problem: Brakuje 2 pracowników, brak 2 wagonów 
+    1. Godziny działania: 09:00 - 17:00 
+    2. Liczba wagonów: 4/6 
+    3. Dostępny personel: 8/10 
+    4. Klienci dziennie: 150 
+    5. Problem: Brakuje 2 pracowników, brak 2 wagonów 
+
 Wymagania techniczne : 
 1. Użyj PHP w wersji 8.0 lub nowszej. 
 2. Użycie frameworka Codeigniter 4 

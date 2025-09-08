@@ -41,7 +41,7 @@ class Statistics extends BaseApiController
     public function index(): ResponseInterface
     {
         $statistics = $this->handleServiceOperation(
-            fn() => $this->statisticsService->generateSystemStatistics(),
+            fn() => $this->statisticsServi(),
             'Failed to generate system statistics'
         );
 
