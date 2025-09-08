@@ -6,6 +6,8 @@ namespace App\Services;
 
 use App\Models\WagonModel;
 use App\Models\CoasterModel;
+use App\Services\ProblemLogService;
+use App\Services\StatisticsService;
 
 /**
  * Wagon Service
@@ -18,11 +20,15 @@ class WagonService
 {
     private WagonModel $wagonModel;
     private CoasterModel $coasterModel;
+    private ProblemLogService $problemLogService;
+    private StatisticsService $statisticsService;
 
     public function __construct()
     {
         $this->wagonModel = new WagonModel();
         $this->coasterModel = new CoasterModel();
+        $this->problemLogService = new ProblemLogService();
+        $this->statisticsService = new StatisticsService();
     }
 
     /**
@@ -53,6 +59,9 @@ class WagonService
             if (!$success) {
                 throw new \RuntimeException('Nie udało się zapisać wagonu');
             }
+
+            // Check for problems after adding wagon and log them
+            $this->checkAndLogCoasterProblems($coasterId);
 
             // Return created wagon with ID
             return $wagon;
@@ -106,7 +115,14 @@ class WagonService
             }
 
             // Delete wagon
-            return $this->wagonModel->delete($wagonId);
+            $deleted = $this->wagonModel->delete($wagonId);
+            
+            if ($deleted) {
+                // Check for problems after removing wagon and log them
+                $this->checkAndLogCoasterProblems($coasterId);
+            }
+            
+            return $deleted;
 
         } catch (\Exception $e) {
             log_message('error', 'WagonService::deleteWagon failed: ' . $e->getMessage());
@@ -207,5 +223,28 @@ class WagonService
             'average_speed' => round($averageSpeed / $wagonCount, 2),
             'wagon_count' => $wagonCount,
         ];
+    }
+
+    /**
+     * Check for problems with specific coaster and log them
+     * 
+     * @param string $coasterId
+     * @return void
+     */
+    private function checkAndLogCoasterProblems(string $coasterId): void
+    {
+        try {
+            $coasterStats = $this->statisticsService->getCoasterStatistics($coasterId);
+            
+            if ($coasterStats && !empty($coasterStats['problems'])) {
+                $this->problemLogService->logCoasterProblems(
+                    $coasterStats['name'],
+                    $coasterStats['problems'],
+                    $coasterId
+                );
+            }
+        } catch (\Exception $e) {
+            log_message('error', 'WagonService::checkAndLogCoasterProblems failed: ' . $e->getMessage());
+        }
     }
 }

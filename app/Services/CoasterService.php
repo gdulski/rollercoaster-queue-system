@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\CoasterModel;
+use App\Services\ProblemLogService;
+use App\Services\StatisticsService;
 use CodeIgniter\HTTP\ResponseInterface;
 
 /**
@@ -17,10 +19,14 @@ use CodeIgniter\HTTP\ResponseInterface;
 class CoasterService
 {
     private readonly CoasterModel $coasterModel;
+    private readonly ProblemLogService $problemLogService;
+    private readonly StatisticsService $statisticsService;
 
     public function __construct()
     {
         $this->coasterModel = new CoasterModel();
+        $this->problemLogService = new ProblemLogService();
+        $this->statisticsService = new StatisticsService();
     }
 
     /**
@@ -59,6 +65,9 @@ class CoasterService
             $this->coasterModel->addToIndex($coasterId);
 
             error_log('Coaster created successfully: ' . $coasterId);
+            
+            // Check for problems after creation and log them
+            $this->checkAndLogCoasterProblems($coasterId);
             
             return $coasterData;
 
@@ -148,6 +157,9 @@ class CoasterService
 
             error_log('Coaster updated successfully: ' . $id);
             
+            // Check for problems after update and log them
+            $this->checkAndLogCoasterProblems($id);
+            
             return $updateData;
 
         } catch (\Exception $e) {
@@ -196,6 +208,29 @@ class CoasterService
         } catch (\Exception $e) {
             error_log('CoasterService::getCoasterStatistics failed: ' . $e->getMessage());
             return [];
+        }
+    }
+
+    /**
+     * Check for problems with specific coaster and log them
+     * 
+     * @param string $coasterId
+     * @return void
+     */
+    private function checkAndLogCoasterProblems(string $coasterId): void
+    {
+        try {
+            $coasterStats = $this->statisticsService->getCoasterStatistics($coasterId);
+            
+            if ($coasterStats && !empty($coasterStats['problems'])) {
+                $this->problemLogService->logCoasterProblems(
+                    $coasterStats['name'],
+                    $coasterStats['problems'],
+                    $coasterId
+                );
+            }
+        } catch (\Exception $e) {
+            error_log('CoasterService::checkAndLogCoasterProblems failed: ' . $e->getMessage());
         }
     }
 }

@@ -152,12 +152,14 @@ class StatisticsService
         
         // If capacity is less than 80% of daily customers, suggest more wagons
         if ($estimatedDailyCapacity < ($dailyCustomers * 0.8)) {
-            $problems[] = "Zbyt mała przepustowość - rozważ dodanie wagonów";
+            $neededWagons = ceil(($dailyCustomers * 0.8 - $estimatedDailyCapacity) / ($totalSeats > 0 ? $totalSeats : 1));
+            $problems[] = "Brak {$neededWagons} wagonów";
         }
         
         // If capacity is more than 200% of daily customers, suggest wagon reduction
         if ($estimatedDailyCapacity > ($dailyCustomers * 2)) {
-            $problems[] = "Nadmiarowa przepustowość - zbyt dużo wagonów";
+            $excessWagons = floor(($estimatedDailyCapacity - $dailyCustomers * 2) / ($totalSeats > 0 ? $totalSeats : 1));
+            $problems[] = "Nadmiar {$excessWagons} wagonów";
         }
         
         return $problems;
