@@ -24,4 +24,11 @@ $routes->group('api', function($routes) {
     $routes->get('coasters/(:segment)/wagons', 'Api\Wagons::getWagons/$1');             // GET /api/coasters/{coasterId}/wagons
     $routes->get('coasters/(:segment)/wagons/(:segment)', 'Api\Wagons::getWagon/$1/$2'); // GET /api/coasters/{coasterId}/wagons/{wagonId}
     $routes->delete('coasters/(:segment)/wagons/(:segment)', 'Api\Wagons::deleteWagon/$1/$2'); // DELETE /api/coasters/{coasterId}/wagons/{wagonId}
+    
+    // Statistics endpoints
+    $routes->get('statistics', 'Api\Statistics::index');                               // GET /api/statistics
+    $routes->get('statistics/health', 'Api\Statistics::health');                       // GET /api/statistics/health
+    $routes->get('statistics/display', 'Api\Statistics::display');                     // GET /api/statistics/display
+    $routes->get('statistics/monitor', 'Api\Statistics::monitor');                     // GET /api/statistics/monitor
+    $routes->get('statistics/coaster/(:segment)', 'Api\Statistics::coaster/$1');       // GET /api/statistics/coaster/{id}
 });

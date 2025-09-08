@@ -147,7 +147,7 @@ abstract class BaseRedisModel
             $data = [];
             
             foreach ($ids as $id) {
-                $item = $this->find($id);
+                $item = $this->findData($id);
                 if ($item) {
                     $data[] = $item;
                 }
