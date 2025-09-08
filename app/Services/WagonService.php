@@ -43,8 +43,8 @@ class WagonService
             // Prepare wagon data
             $wagon = [
                 'coaster_id' => $coasterId,
-                'ilosc_miejsc' => (int) $wagonData['ilosc_miejsc'],
-                'predkosc_wagonu' => (float) $wagonData['predkosc_wagonu'],
+                'seat_count' => (int) $wagonData['seat_count'],
+                'wagon_speed' => (float) $wagonData['wagon_speed'],
             ];
 
             // Save wagon
@@ -161,7 +161,7 @@ class WagonService
      */
     public function validateWagonData(array $data): bool
     {
-        $required = ['ilosc_miejsc', 'predkosc_wagonu'];
+        $required = ['seat_count', 'wagon_speed'];
         
         foreach ($required as $field) {
             if (!isset($data[$field])) {
@@ -170,7 +170,7 @@ class WagonService
         }
 
         // Additional business rules validation
-        if ($data['ilosc_miejsc'] <= 0 || $data['predkosc_wagonu'] <= 0) {
+        if ($data['seat_count'] <= 0 || $data['wagon_speed'] <= 0) {
             return false;
         }
 
@@ -198,8 +198,8 @@ class WagonService
         }
 
         foreach ($wagons as $wagon) {
-            $totalSeats += $wagon['ilosc_miejsc'];
-            $averageSpeed += $wagon['predkosc_wagonu'];
+            $totalSeats += $wagon['seat_count'];
+            $averageSpeed += $wagon['wagon_speed'];
         }
 
         return [
