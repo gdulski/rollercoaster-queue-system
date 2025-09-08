@@ -40,7 +40,7 @@ class CoasterModel extends BaseRedisModel
             return $result > 0;
 
         } catch (\Exception $e) {
-            log_message('error', 'CoasterModel::addToIndex failed: ' . $e->getMessage());
+            error_log('CoasterModel::addToIndex failed: ' . $e->getMessage());
             return false;
         }
     }
@@ -73,7 +73,7 @@ class CoasterModel extends BaseRedisModel
             return $coasters;
 
         } catch (\Exception $e) {
-            log_message('error', 'CoasterModel::paginate failed: ' . $e->getMessage());
+            error_log('CoasterModel::paginate failed: ' . $e->getMessage());
             return [];
         }
     }
@@ -112,7 +112,7 @@ class CoasterModel extends BaseRedisModel
             return $results;
 
         } catch (\Exception $e) {
-            log_message('error', 'CoasterModel::search failed: ' . $e->getMessage());
+            error_log('CoasterModel::search failed: ' . $e->getMessage());
             return [];
         }
     }

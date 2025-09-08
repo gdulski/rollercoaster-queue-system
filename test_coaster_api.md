@@ -1,20 +1,36 @@
 # Test API dla kolejek górskich
 
+## Uruchomienie testów
+
+### Testy jednostkowe (PHPUnit)
+
+**Uwaga:** Testy wymagają uruchomionej aplikacji z Redis.
+
+```bash
+# 1. Uruchom aplikację
+docker-compose up -d
+
+# 2. Uruchom wszystkie testy
+./vendor/bin/phpunit
+
+# 3. Uruchom tylko testy coastera
+./vendor/bin/phpunit tests/unit/CoasterApiTest.php
+
+# 4. Uruchom z pokryciem kodu
+./vendor/bin/phpunit --coverage-html tests/coverage/
+```
+
+### Testy integracyjne (curl)
+
 ## Endpoint: POST /api/coasters
 
 ### Test 1: Utworzenie nowej kolejki górskiej
 
 **Request:**
 ```bash
-curl -X POST http://localhost:8080/api/coasters \
-  -H "Content-Type: application/json" \
-  -d '{
-    "staff_count": 16,
-    "daily_customers": 60000,
-    "track_length": 1800,
-    "opening_time": "8:00",
-    "closing_time": "16:00"
-  }'
+
+
+
 ```
 
 **Oczekiwana odpowiedź:**
@@ -132,9 +148,9 @@ curl -X POST http://localhost:8080/api/coasters \
 }
 ```
 
-## Uruchomienie testów
+## Uruchomienie aplikacji
 
-1. Upewnij się, że aplikacja działa:
+1. Uruchom kontenery:
    ```bash
    docker-compose up -d
    ```
@@ -149,4 +165,36 @@ curl -X POST http://localhost:8080/api/coasters \
    curl http://localhost:8080/api/health/redis
    ```
 
-4. Wykonaj testy w kolejności podanej powyżej.
+## Testy z Postman/Insomnia
+
+Importuj kolekcję z pliku `postman_collection.json` do Postman lub Insomnia.
+
+## Testy z HTTPie
+
+```bash
+# Instalacja
+pip install httpie
+
+# Test POST
+http POST localhost:8080/api/coasters \
+  staff_count:=16 \
+  daily_customers:=60000 \
+  track_length:=1800 \
+  opening_time="8:00" \
+  closing_time="16:00"
+
+# Test GET
+http GET localhost:8080/api/coasters
+```
+
+## Testy Redis
+
+```bash
+# Połącz się z Redis
+docker-compose exec redis redis-cli
+
+# W Redis CLI:
+KEYS coaster:*
+SMEMBERS coasters:index
+GET coaster:coaster_1234567890_1234
+```

@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
-
 /**
  * Base Redis Model
  * 
@@ -11,7 +9,7 @@ use CodeIgniter\Model;
  * 
  * @package App\Models
  */
-abstract class BaseRedisModel extends Model
+abstract class BaseRedisModel
 {
     /**
      * Redis connection
@@ -33,8 +31,14 @@ abstract class BaseRedisModel extends Model
      */
     public function __construct()
     {
-        parent::__construct();
-        $this->redis = \Config\Services::redis();
+        $config = new \Config\Redis();
+        $this->redis = new \Predis\Client([
+            'scheme' => 'tcp',
+            'host'   => $config->host,
+            'port'   => $config->port,
+            'password' => $config->password,
+            'database' => $config->database,
+        ]);
     }
 
     /**
@@ -51,10 +55,10 @@ abstract class BaseRedisModel extends Model
             
             $result = $this->redis->set($key, $jsonData);
             
-            return $result === 'OK';
+            return $result->getPayload() === 'OK';
 
         } catch (\Exception $e) {
-            log_message('error', get_class($this) . '::save failed: ' . $e->getMessage());
+            error_log(get_class($this) . '::save failed: ' . $e->getMessage());
             return false;
         }
     }
@@ -78,7 +82,7 @@ abstract class BaseRedisModel extends Model
             return json_decode($jsonData, true);
 
         } catch (\Exception $e) {
-            log_message('error', get_class($this) . '::find failed: ' . $e->getMessage());
+            error_log(get_class($this) . '::find failed: ' . $e->getMessage());
             return null;
         }
     }
@@ -98,7 +102,7 @@ abstract class BaseRedisModel extends Model
             return $result > 0;
 
         } catch (\Exception $e) {
-            log_message('error', get_class($this) . '::delete failed: ' . $e->getMessage());
+            error_log(get_class($this) . '::delete failed: ' . $e->getMessage());
             return false;
         }
     }
@@ -126,7 +130,7 @@ abstract class BaseRedisModel extends Model
             }, $keys);
 
         } catch (\Exception $e) {
-            log_message('error', get_class($this) . '::getAllIds failed: ' . $e->getMessage());
+            error_log(get_class($this) . '::getAllIds failed: ' . $e->getMessage());
             return [];
         }
     }
@@ -152,7 +156,7 @@ abstract class BaseRedisModel extends Model
             return $data;
 
         } catch (\Exception $e) {
-            log_message('error', get_class($this) . '::getAll failed: ' . $e->getMessage());
+            error_log(get_class($this) . '::getAll failed: ' . $e->getMessage());
             return [];
         }
     }
@@ -177,7 +181,7 @@ abstract class BaseRedisModel extends Model
             return count($keys);
 
         } catch (\Exception $e) {
-            log_message('error', get_class($this) . '::count failed: ' . $e->getMessage());
+            error_log(get_class($this) . '::count failed: ' . $e->getMessage());
             return 0;
         }
     }
@@ -195,7 +199,7 @@ abstract class BaseRedisModel extends Model
             return $this->redis->exists($key) > 0;
 
         } catch (\Exception $e) {
-            log_message('error', get_class($this) . '::exists failed: ' . $e->getMessage());
+            error_log(get_class($this) . '::exists failed: ' . $e->getMessage());
             return false;
         }
     }
@@ -238,7 +242,7 @@ abstract class BaseRedisModel extends Model
             return $result > 0;
 
         } catch (\Exception $e) {
-            log_message('error', get_class($this) . '::clearAll failed: ' . $e->getMessage());
+            error_log(get_class($this) . '::clearAll failed: ' . $e->getMessage());
             return false;
         }
     }

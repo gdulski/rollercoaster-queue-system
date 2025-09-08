@@ -1,7 +1,7 @@
 # System Kolejek Górskich - Makefile
 # Ułatwienia do zarządzania projektem
 
-.PHONY: help start stop restart clean build logs status test health redis
+.PHONY: help start stop restart clean build rebuild logs status test test-unit test-coverage test-watch health redis
 
 # Domyślna komenda
 help: ## Wyświetl dostępne komendy
@@ -41,6 +41,10 @@ build: ## Zbuduj obrazy bez uruchamiania
 	@echo "🔨 Budowanie obrazów..."
 	@docker-compose build
 
+rebuild: ## Przebuduj obrazy od nowa
+	@echo "🔄 Przebudowywanie obrazów od nowa..."
+	@docker-compose build --no-cache
+
 logs: ## Wyświetl logi wszystkich kontenerów
 	@echo "📋 Logi kontenerów:"
 	@docker-compose logs -f
@@ -58,7 +62,7 @@ status: ## Sprawdź status kontenerów
 	@echo "📊 Status kontenerów:"
 	@docker-compose ps
 
-test: ## Uruchom testy API
+test: ## Uruchom testy API (health check)
 	@echo "🧪 Testowanie API..."
 	@echo "Health Check:"
 	@curl -s http://localhost:8080/api/health | jq . 2>/dev/null || curl -s http://localhost:8080/api/health
@@ -67,6 +71,20 @@ test: ## Uruchom testy API
 	@curl -s http://localhost:8080/api/health/redis | jq . 2>/dev/null || curl -s http://localhost:8080/api/health/redis
 	@echo ""
 	@echo "🎉 Testy zakończone!"
+
+test-unit: ## Uruchom testy jednostkowe PHPUnit
+	@echo "🧪 Uruchamianie testów jednostkowych..."
+	@docker-compose exec php ./vendor/bin/phpunit --colors=always
+	@echo "🎉 Testy jednostkowe zakończone!"
+
+test-coverage: ## Uruchom testy z pokryciem kodu
+	@echo "📊 Uruchamianie testów z pokryciem kodu..."
+	@docker-compose exec php ./vendor/bin/phpunit --coverage-html=build/logs/html --coverage-text --colors=always
+	@echo "📈 Raport pokrycia dostępny w: build/logs/html/index.html"
+
+test-watch: ## Uruchom testy w trybie watch (automatyczne powtarzanie)
+	@echo "👀 Uruchamianie testów w trybie watch..."
+	@docker-compose exec php ./vendor/bin/phpunit --watch --colors=always
 
 health: ## Sprawdź health check
 	@echo "🏥 Health Check:"

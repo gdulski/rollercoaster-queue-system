@@ -40,7 +40,7 @@ class Services extends BaseService
             return static::getSharedInstance('redis');
         }
 
-        $config = config('Redis');
+        $config = new \Config\Redis();
         
         return new Client([
             'scheme' => 'tcp',

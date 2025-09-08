@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y \
     unzip \
     libzip-dev \
     libicu-dev \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip intl
+    && docker-php-ext-install pdo_mysql mysqli mbstring exif pcntl bcmath gd zip intl
 
 # Install Redis extension
 RUN pecl install redis && docker-php-ext-enable redis

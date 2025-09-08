@@ -51,19 +51,19 @@ class CoasterService
             $saved = $this->coasterModel->saveData($coasterData);
             
             if (!$saved) {
-                log_message('error', 'Failed to save coaster to Redis: ' . json_encode($coasterData));
+                error_log('Failed to save coaster to Redis: ' . json_encode($coasterData));
                 return null;
             }
 
             // Add coaster to index
             $this->coasterModel->addToIndex($coasterId);
 
-            log_message('info', 'Coaster created successfully: ' . $coasterId);
+            error_log('Coaster created successfully: ' . $coasterId);
             
             return $coasterData;
 
         } catch (\Exception $e) {
-            log_message('error', 'CoasterService::createCoaster failed: ' . $e->getMessage());
+            error_log('CoasterService::createCoaster failed: ' . $e->getMessage());
             return null;
         }
     }
@@ -89,7 +89,7 @@ class CoasterService
             return $coasters;
 
         } catch (\Exception $e) {
-            log_message('error', 'CoasterService::getAllCoasters failed: ' . $e->getMessage());
+            error_log('CoasterService::getAllCoasters failed: ' . $e->getMessage());
             return [];
         }
     }
@@ -105,7 +105,7 @@ class CoasterService
         try {
             return $this->coasterModel->findData($id);
         } catch (\Exception $e) {
-            log_message('error', 'CoasterService::getCoasterById failed: ' . $e->getMessage());
+            error_log('CoasterService::getCoasterById failed: ' . $e->getMessage());
             return null;
         }
     }
@@ -142,16 +142,16 @@ class CoasterService
             $updated = $this->coasterModel->saveData($updateData);
             
             if (!$updated) {
-                log_message('error', 'Failed to update coaster in Redis: ' . json_encode($updateData));
+                error_log('Failed to update coaster in Redis: ' . json_encode($updateData));
                 return null;
             }
 
-            log_message('info', 'Coaster updated successfully: ' . $id);
+            error_log('Coaster updated successfully: ' . $id);
             
             return $updateData;
 
         } catch (\Exception $e) {
-            log_message('error', 'CoasterService::updateCoaster failed: ' . $e->getMessage());
+            error_log('CoasterService::updateCoaster failed: ' . $e->getMessage());
             return null;
         }
     }
@@ -194,7 +194,7 @@ class CoasterService
             ];
 
         } catch (\Exception $e) {
-            log_message('error', 'CoasterService::getCoasterStatistics failed: ' . $e->getMessage());
+            error_log('CoasterService::getCoasterStatistics failed: ' . $e->getMessage());
             return [];
         }
     }

@@ -1,0 +1,124 @@
+{
+  "info": {
+    "name": "Rollercoaster Queue System API",
+    "description": "API tests for rollercoaster queue management system",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/health",
+          "host": ["{{base_url}}"],
+          "path": ["api", "health"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Coaster - Success",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"staff_count\": 16,\n  \"daily_customers\": 60000,\n  \"track_length\": 1800,\n  \"opening_time\": \"8:00\",\n  \"closing_time\": \"16:00\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/coasters",
+          "host": ["{{base_url}}"],
+          "path": ["api", "coasters"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Coaster - Validation Error",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"staff_count\": 16\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/coasters",
+          "host": ["{{base_url}}"],
+          "path": ["api", "coasters"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get All Coasters",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/coasters",
+          "host": ["{{base_url}}"],
+          "path": ["api", "coasters"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Coaster by ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/coasters/{{coaster_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["api", "coasters", "{{coaster_id}}"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update Coaster",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"staff_count\": 20,\n  \"daily_customers\": 70000,\n  \"track_length\": 1800,\n  \"opening_time\": \"7:00\",\n  \"closing_time\": \"17:00\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/coasters/{{coaster_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["api", "coasters", "{{coaster_id}}"]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "coaster_id",
+      "value": "coaster_1234567890_1234"
+    }
+  ]
+}

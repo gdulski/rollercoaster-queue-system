@@ -14,10 +14,8 @@ $routes->group('api', function($routes) {
     $routes->get('health/redis', 'Api\Health::redis');
     
     // Coasters endpoints
-    $routes->group('coasters', function($routes) {
-        $routes->post('/', 'Api\Coasters::create');           // POST /api/coasters
-        $routes->get('/', 'Api\Coasters::index');             // GET /api/coasters
-        $routes->get('/(:segment)', 'Api\Coasters::show');    // GET /api/coasters/{id}
-        $routes->put('/(:segment)', 'Api\Coasters::update');  // PUT /api/coasters/{id}
-    });
+    $routes->get('coasters/(:segment)', 'Api\Coasters::show/$1');    // GET /api/coasters/{id}
+    $routes->put('coasters/(:segment)', 'Api\Coasters::update');  // PUT /api/coasters/{id}
+    $routes->post('coasters', 'Api\Coasters::create');           // POST /api/coasters
+    $routes->get('coasters', 'Api\Coasters::index');             // GET /api/coasters
 });
