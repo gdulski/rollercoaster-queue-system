@@ -71,9 +71,6 @@ class Coasters extends BaseApiController
      */
     public function index(): ResponseInterface
     {
-        log_message('error', '=== INDEX METHOD START (ERROR LEVEL) ===');
-        log_message('info', '=== INDEX METHOD START (INFO LEVEL) ===');
-        log_message('debug', '=== INDEX METHOD START (DEBUG LEVEL) ===');
         
         $coasters = $this->handleServiceOperation(
             fn() => $this->coasterService->getAllCoasters(),
@@ -97,12 +94,7 @@ class Coasters extends BaseApiController
      */
     public function show($id = null): ResponseInterface
     {
-        log_message('info', '=== SHOW METHOD START ===');
-        log_message('info', 'Received ID: ' . var_export($id, true));
-        log_message('info', 'Request URI: ' . $this->request->getUri());
-        log_message('info', 'Method: ' . $this->request->getMethod());
-        
-        log_message('info', 'Show method called with ID: ' . var_export($id, true));
+
         $idError = $this->validateId($id);
         if ($idError) {
             return $this->errorResponse($idError, 400);

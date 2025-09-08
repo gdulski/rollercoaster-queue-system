@@ -17,20 +17,20 @@ class WagonValidation extends BaseConfig
      * Wagon validation rules
      */
     public array $rules = [
-        'seat_count'    => 'required|integer|greater_than[0]',
-        'wagon_speed'   => 'required|decimal|greater_than[0]',
+        'ilosc_miejsc'    => 'required|integer|greater_than[0]',
+        'predkosc_wagonu' => 'required|decimal|greater_than[0]',
     ];
 
     /**
      * Wagon validation messages
      */
     public array $messages = [
-        'seat_count' => [
+        'ilosc_miejsc' => [
             'required'      => 'Pole ilość miejsc jest wymagane',
             'integer'       => 'Ilość miejsc musi być liczbą całkowitą',
             'greater_than'  => 'Ilość miejsc musi być większa od 0',
         ],
-        'wagon_speed' => [
+        'predkosc_wagonu' => [
             'required'      => 'Pole prędkość wagonu jest wymagane',
             'decimal'       => 'Prędkość wagonu musi być liczbą',
             'greater_than'  => 'Prędkość wagonu musi być większa od 0',
