@@ -4,7 +4,7 @@ namespace App\Commands;
 
 use CodeIgniter\CLI\BaseCommand;
 use CodeIgniter\CLI\CLI;
-use CodeIgniter\HTTP\CURLRequest;
+use App\Services\StatisticsService;
 
 /**
  * Komenda CLI do wyświetlania aktualnego stanu kolejek górskich
@@ -13,6 +13,11 @@ use CodeIgniter\HTTP\CURLRequest;
  */
 class QueueStatus extends BaseCommand
 {
+    /**
+     * Statistics Service
+     */
+    private readonly StatisticsService $statisticsService;
+
     /**
      * Grupa komendy
      */
@@ -47,6 +52,14 @@ class QueueStatus extends BaseCommand
     ];
 
     /**
+     * Konstruktor - inicjalizuje StatisticsService
+     */
+    public function __construct()
+    {
+        $this->statisticsService = new StatisticsService();
+    }
+
+    /**
      * Główna metoda wykonująca komendę
      */
     public function run(array $params): void
@@ -64,7 +77,7 @@ class QueueStatus extends BaseCommand
             CLI::newLine();
         }
 
-        // Na razie wyświetlamy prosty tekst jak zostało poproszone
+        // Pobierz dane bezpośrednio z StatisticsService
         $statusData = $this->getQueueStatus();
 
         if ($jsonOutput) {
@@ -78,39 +91,26 @@ class QueueStatus extends BaseCommand
     }
 
     /**
-     * Pobiera aktualny status kolejek z API endpoint /api/statistics/display
+     * Pobiera aktualny status kolejek bezpośrednio z StatisticsService
      * 
      * @return array
      */
     private function getQueueStatus(): array
     {
         try {
-            // Pobierz dane z API endpoint
-            $apiUrl = 'http://localhost:8080/api/statistics/display';
-            
             if ($this->isRefreshRequested()) {
-                CLI::write('🔄 Pobieranie danych z API...', 'blue');
+                CLI::write('🔄 Generowanie statystyk systemu...', 'blue');
             }
             
-            $client = \Config\Services::curlrequest();
-            $response = $client->get($apiUrl, [
-                'timeout' => 10,
-                'http_errors' => false
-            ]);
+            // Pobierz dane bezpośrednio z StatisticsService
+            $statistics = $this->statisticsService->generateSystemStatistics();
             
-            if ($response->getStatusCode() !== 200) {
-                CLI::write('❌ Błąd połączenia z API: ' . $response->getStatusCode(), 'red');
+            if (!$statistics) {
+                CLI::write('❌ Błąd podczas generowania statystyk', 'red');
                 return $this->getFallbackData();
             }
             
-            $responseData = json_decode($response->getBody(), true);
-            
-            if (!$responseData || !$responseData['success']) {
-                CLI::write('❌ Błąd odpowiedzi API', 'red');
-                return $this->getFallbackData();
-            }
-            
-            return $this->transformApiData($responseData['data']);
+            return $this->transformStatisticsData($statistics);
             
         } catch (\Exception $e) {
             CLI::write('❌ Błąd podczas pobierania danych: ' . $e->getMessage(), 'red');
@@ -130,64 +130,43 @@ class QueueStatus extends BaseCommand
     }
     
     /**
-     * Transformuje dane z API do formatu używanego przez komendę
+     * Transformuje dane z StatisticsService do formatu używanego przez komendę
      * 
-     * @param array $apiData
+     * @param array $statistics
      * @return array
      */
-    private function transformApiData(array $apiData): array
+    private function transformStatisticsData(array $statistics): array
     {
         $transformed = [];
         
-        foreach ($apiData['coasters'] as $coaster) {
-            // Wyciągnij nazwę z formatu "[Kolejka XYZ]"
-            $name = trim($coaster['name'], '[]');
-            
-            // Znajdź status z details
-            $statusDetail = '';
-            $personnelInfo = '';
-            $wagonCount = 0;
-            
-            foreach ($coaster['details'] as $detail) {
-                if (str_contains($detail, '5. Status:')) {
-                    $statusDetail = str_replace('5. Status: ', '', $detail);
-                } elseif (str_contains($detail, '5. Problem:')) {
-                    $statusDetail = str_replace('5. Problem: ', '', $detail);
-                } elseif (str_contains($detail, '3. Dostępny personel:')) {
-                    $personnelInfo = str_replace('3. Dostępny personel: ', '', $detail);
-                } elseif (str_contains($detail, '2. Liczba wagonów:')) {
-                    $wagonCount = (int) str_replace('2. Liczba wagonów: ', '', $detail);
-                }
-            }
-            
-            // Określ status na podstawie problemów
-            $status = str_contains($statusDetail, 'OK') ? 'Aktywna' : 'Problem';
-            
+        foreach ($statistics['coasters'] as $coaster) {
             $transformed[] = [
-                'name' => $name,
-                'status' => $status,
-                'personnel' => $personnelInfo,
-                'wagons' => $wagonCount,
-                'problems' => $status === 'Problem' ? $statusDetail : 'Brak problemów'
+                'name' => $coaster['name'],
+                'status' => $coaster['status'] === 'OK' ? 'Aktywna' : 'Problem',
+                'personnel' => $coaster['available_personnel'] . '/' . $coaster['required_personnel'],
+                'wagons' => $coaster['wagon_count'],
+                'problems' => empty($coaster['problems']) ? 'Brak problemów' : implode(', ', $coaster['problems']),
+                'operating_hours' => $coaster['operating_hours'],
+                'daily_customers' => $coaster['daily_customers']
             ];
         }
         
         // Dodaj podsumowanie systemu
         $transformed['summary'] = [
-            'timestamp' => $apiData['header'],
-            'date' => $apiData['date'],
-            'total_coasters' => $apiData['summary']['total_coasters'],
-            'total_wagons' => $apiData['summary']['total_wagons'],
-            'total_personnel' => $apiData['summary']['total_personnel'],
-            'system_status' => $apiData['summary']['system_status'],
-            'problematic_coasters' => $apiData['summary']['problematic_coasters']
+            'timestamp' => '[' . $statistics['timestamp'] . ']',
+            'date' => $statistics['date'],
+            'total_coasters' => $statistics['summary']['total_coasters'],
+            'total_wagons' => $statistics['summary']['total_wagons'],
+            'total_personnel' => $statistics['summary']['total_available_personnel'] . '/' . $statistics['summary']['total_required_personnel'],
+            'system_status' => $statistics['summary']['system_status'],
+            'problematic_coasters' => $statistics['summary']['coasters_with_problems']
         ];
         
         return $transformed;
     }
     
     /**
-     * Zwraca dane awaryjne gdy API jest niedostępne
+     * Zwraca dane awaryjne gdy StatisticsService nie działa
      * 
      * @return array
      */
@@ -199,7 +178,7 @@ class QueueStatus extends BaseCommand
                 'status' => 'Niedostępna',
                 'personnel' => 'N/A',
                 'wagons' => 0,
-                'problems' => 'Brak połączenia z API'
+                'problems' => 'Błąd StatisticsService'
             ],
             'summary' => [
                 'timestamp' => '[' . date('H:i') . ']',
@@ -207,7 +186,7 @@ class QueueStatus extends BaseCommand
                 'total_coasters' => 0,
                 'total_wagons' => 0,
                 'total_personnel' => 'N/A',
-                'system_status' => 'BŁĄD POŁĄCZENIA',
+                'system_status' => 'BŁĄD SYSTEMU',
                 'problematic_coasters' => 0
             ]
         ];

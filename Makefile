@@ -1,7 +1,7 @@
 # System Kolejek Górskich - Makefile
 # Ułatwienia do zarządzania projektem
 
-.PHONY: help start stop restart clean build rebuild logs status test test-unit test-coverage test-watch health redis
+.PHONY: help start stop restart clean build rebuild logs status test test-unit test-coverage test-watch health redis coaster-status coaster-status-json coaster-status-refresh
 
 # Domyślna komenda
 help: ## Wyświetl dostępne komendy
@@ -105,6 +105,18 @@ shell-nginx: ## Otwórz shell w kontenerze nginx
 shell-redis: ## Otwórz Redis CLI
 	@echo "🔴 Otwieranie Redis CLI..."
 	@docker-compose exec redis redis-cli
+
+coaster-status: ## Wyświetl status kolejek górskich
+	@echo "🎢 Status kolejek górskich:"
+	@docker-compose exec php php spark coaster:status
+
+coaster-status-json: ## Wyświetl status kolejek w formacie JSON
+	@echo "🎢 Status kolejek górskich (JSON):"
+	@docker-compose exec php php spark coaster:status --json
+
+coaster-status-refresh: ## Odśwież i wyświetl status kolejek
+	@echo "🔄 Odświeżanie statusu kolejek górskich:"
+	@docker-compose exec php php spark coaster:status --refresh
 
 install: ## Zainstaluj zależności PHP
 	@echo "📦 Instalowanie zależności PHP..."
